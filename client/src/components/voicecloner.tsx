@@ -65,7 +65,7 @@ export default function VoiceClonerApp() {
 
 		try {
 			const response = await axios.post(
-				"http://localhost:5000/api/voice/clone-and-tts",
+				"https://voice-clone-tts-backend.vercel.app/api/voice/clone-and-tts",
 				formData,
 				{
 					headers: {
