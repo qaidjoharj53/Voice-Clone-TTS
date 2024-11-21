@@ -1,17 +1,9 @@
 import React, { useState, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-	throw new Error("Missing Supabase URL or Anon Key");
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import axios from "axios";
 
 export default function VoiceClonerApp() {
 	const [voiceFile, setVoiceFile] = useState<File | null>(null);
+	const [voiceFileUrl, setVoiceFileUrl] = useState<string | null>(null);
 	const [text, setText] = useState("");
 	const [generatedAudioUrl, setGeneratedAudioUrl] = useState("");
 	const [error, setError] = useState("");
@@ -26,13 +18,18 @@ export default function VoiceClonerApp() {
 					"Oops, this file is too big! Please try again with a file up to 5 MB."
 				);
 				if (fileInputRef.current) fileInputRef.current.value = "";
+				setVoiceFile(null);
+				setVoiceFileUrl(null);
 			} else if (!file.type.startsWith("audio/")) {
 				setError(
 					"Oops, this file format is not supported! Please try again with an audio file."
 				);
 				if (fileInputRef.current) fileInputRef.current.value = "";
+				setVoiceFile(null);
+				setVoiceFileUrl(null);
 			} else {
 				setVoiceFile(file);
+				setVoiceFileUrl(URL.createObjectURL(file));
 				setError("");
 			}
 		}
@@ -61,29 +58,31 @@ export default function VoiceClonerApp() {
 		setIsLoading(true);
 		setError("");
 
+		const formData = new FormData();
+		formData.append("voiceFile", voiceFile);
+		formData.append("text", text);
+
 		try {
-			// Upload voice file to Supabase storage
-			const { data: uploadData, error: uploadError } =
-				await supabase.storage
-					.from("voice-files")
-					.upload(
-						`original/${Date.now()}-${voiceFile.name}`,
-						voiceFile
-					);
-
-			if (uploadError) throw uploadError;
-
-			// Here you would typically call your backend API to process the audio
-			// For this example, we'll just simulate a delay
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-
-			// Simulate getting a generated audio file URL
-			const fakeGeneratedUrl = `https://example.com/generated-audio-${Date.now()}.mp3`;
-			setGeneratedAudioUrl(fakeGeneratedUrl);
-		} catch (err) {
-			setError(
-				"An error occurred while processing your request. Please try again."
+			const response = await axios.post(
+				"http://localhost:5000/api/voice/clone-and-tts",
+				formData,
+				{
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+				}
 			);
+
+			setGeneratedAudioUrl(response.data.audioUrl);
+		} catch (err) {
+			if (axios.isAxiosError(err) && err.response) {
+				setError(
+					err.response.data.message ||
+						"An error occurred. Please try again."
+				);
+			} else {
+				setError("An unknown error occurred. Please try again.");
+			}
 			console.error(err);
 		} finally {
 			setIsLoading(false);
@@ -97,7 +96,7 @@ export default function VoiceClonerApp() {
 				<div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
 					<div className="max-w-md mx-auto">
 						<div>
-							<h1 className="text-2xl font-semibold">
+							<h1 className="text-2xl font-semibold text-center">
 								Voice Cloner App
 							</h1>
 						</div>
@@ -115,6 +114,20 @@ export default function VoiceClonerApp() {
 										className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
 									/>
 								</div>
+								{voiceFileUrl && (
+									<div className="mt-2">
+										<label className="leading-loose">
+											Uploaded Voice File
+										</label>
+										<audio
+											controls
+											src={voiceFileUrl}
+											className="w-full mt-1">
+											Your browser does not support the
+											audio element.
+										</audio>
+									</div>
+								)}
 								<div className="flex flex-col">
 									<label className="leading-loose">
 										Enter Text (up to 500 characters)
@@ -143,10 +156,20 @@ export default function VoiceClonerApp() {
 								</div>
 								{generatedAudioUrl && (
 									<div className="pt-4">
+										<label className="leading-loose">
+											Generated Audio
+										</label>
+										<audio
+											controls
+											src={generatedAudioUrl}
+											className="w-full mt-1">
+											Your browser does not support the
+											audio element.
+										</audio>
 										<a
 											href={generatedAudioUrl}
 											download
-											className="bg-green-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none hover:bg-green-600">
+											className="bg-green-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none hover:bg-green-600 mt-2">
 											Download Generated Audio
 										</a>
 									</div>
