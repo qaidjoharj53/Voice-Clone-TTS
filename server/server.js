@@ -13,7 +13,7 @@ const port = process.env.PORT || 5000;
 PlayHT.init({
 	apiKey: process.env.PLAYHT_API_KEY,
 	userId: process.env.PLAYHT_USER_ID,
-	defaultVoiceEngine: "PlayHT2.0",
+	defaultVoiceEngine: "Play3.0-mini",
 });
 
 app.use(cors());

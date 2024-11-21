@@ -32,6 +32,7 @@ export default function VoiceClonerApp() {
 				setVoiceFileUrl(URL.createObjectURL(file));
 				setError("");
 			}
+			setGeneratedAudioUrl("");
 		}
 	};
 
@@ -89,15 +90,36 @@ export default function VoiceClonerApp() {
 		}
 	};
 
+	const handleDownload = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		event.preventDefault();
+		try {
+			const response = await fetch(generatedAudioUrl);
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = "generated_audio.mp3";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Download failed:", error);
+			setError("Failed to download the audio file. Please try again.");
+		}
+	};
+
 	return (
-		<div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-			<div className="relative py-3 sm:max-w-xl sm:mx-auto">
-				<div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-				<div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+		<div className="min-h-screen bg-gradient-to-bl from-cyan-700 to-blue-900 py-6 flex flex-col justify-center sm:py-12">
+			<div className="relative py-3 sm:max-w-3xl sm:mx-auto w-full px-4 sm:px-0">
+				<div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+				<div className="relative bg-white shadow-lg sm:rounded-3xl overflow-hidden">
 					<div className="max-w-md mx-auto">
-						<div>
-							<h1 className="text-2xl font-semibold text-center">
-								Voice Cloner App
+						<div className="px-4 pt-8 sm:px-10">
+							<h1 className="text-3xl font-semibold text-center">
+								Voice Cloner & TTS App
 							</h1>
 						</div>
 						<div className="divide-y divide-gray-200">
@@ -113,21 +135,21 @@ export default function VoiceClonerApp() {
 										accept="audio/*"
 										className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
 									/>
+									{voiceFileUrl && (
+										<div className="mt-2">
+											<label className="leading-loose">
+												Uploaded Voice File
+											</label>
+											<audio
+												controls
+												src={voiceFileUrl}
+												className="w-full mt-1">
+												Your browser does not support
+												the audio element.
+											</audio>
+										</div>
+									)}
 								</div>
-								{voiceFileUrl && (
-									<div className="mt-2">
-										<label className="leading-loose">
-											Uploaded Voice File
-										</label>
-										<audio
-											controls
-											src={voiceFileUrl}
-											className="w-full mt-1">
-											Your browser does not support the
-											audio element.
-										</audio>
-									</div>
-								)}
 								<div className="flex flex-col">
 									<label className="leading-loose">
 										Enter Text (up to 500 characters)
@@ -148,7 +170,7 @@ export default function VoiceClonerApp() {
 									<button
 										onClick={handleGenerate}
 										disabled={isLoading}
-										className="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none hover:bg-blue-600 disabled:bg-blue-300">
+										className="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none hover:bg-blue-600 disabled:bg-blue-400">
 										{isLoading
 											? "Generating..."
 											: "Generate New Voice File"}
@@ -166,12 +188,11 @@ export default function VoiceClonerApp() {
 											Your browser does not support the
 											audio element.
 										</audio>
-										<a
-											href={generatedAudioUrl}
-											download
+										<button
+											onClick={handleDownload}
 											className="bg-green-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none hover:bg-green-600 mt-2">
 											Download Generated Audio
-										</a>
+										</button>
 									</div>
 								)}
 							</div>

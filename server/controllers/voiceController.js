@@ -1,6 +1,18 @@
 const fs = require("fs");
 const PlayHT = require("playht");
 
+async function removeExistingClones() {
+	try {
+		const voices = await PlayHT.listVoices({ isCloned: true });
+		for (const voice of voices) {
+			await PlayHT.deleteClone(voice.id);
+			console.log(`Deleted cloned voice: ${voice.id}`);
+		}
+	} catch (error) {
+		console.error("Error removing existing clones:", error);
+	}
+}
+
 exports.cloneAndSpeak = async (req, res) => {
 	try {
 		const voiceFile = req.file;
@@ -12,10 +24,13 @@ exports.cloneAndSpeak = async (req, res) => {
 				.json({ message: "Missing voice file or text" });
 		}
 
+		// Remove existing clones before creating a new one
+		await removeExistingClones();
+
 		// Clone the voice
 		const fileBlob = fs.readFileSync(voiceFile.path);
 		const cloneName = `clone_${Date.now()}`;
-		const clonedVoice = await PlayHT.clone(cloneName, fileBlob, "male");
+		const clonedVoice = await PlayHT.clone(cloneName, fileBlob);
 
 		// Generate speech with cloned voice
 		const generated = await PlayHT.generate(text, {
