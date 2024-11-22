@@ -10,6 +10,8 @@ export default function VoiceClonerApp() {
 	const [isLoading, setIsLoading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
+	const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -65,7 +67,7 @@ export default function VoiceClonerApp() {
 
 		try {
 			const response = await axios.post(
-				"https://voice-clone-tts-backend.vercel.app/api/voice/clone-and-tts",
+				`${API_URL}/voice/clone-and-tts`,
 				formData,
 				{
 					headers: {

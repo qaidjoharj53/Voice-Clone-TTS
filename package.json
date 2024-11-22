@@ -1,0 +1,16 @@
+{
+	"name": "voice-clone-tts",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"install": "npm run install:client && npm run install:server",
+		"install:client": "cd client && npm install",
+		"install:server": "cd server && npm install",
+		"build": "npm run build:client",
+		"build:client": "cd client && npm run build",
+		"start": "cd server && npm start"
+	},
+	"devDependencies": {
+		"vercel": "^39.1.1"
+	}
+}
