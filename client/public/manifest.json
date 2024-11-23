@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Voice Cloner & TTS App",
+  "name": "Voice Cloner & Text-To-Speech App",
   "icons": [
     {
       "src": "favicon.ico",
