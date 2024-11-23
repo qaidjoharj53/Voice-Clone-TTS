@@ -85,7 +85,7 @@ PLAYHT_USER_ID=your_playht_user_id
 2. Frontend (.env in client directory)
 
 ```env
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5000/api
 ```
 
 ## Running the Application
