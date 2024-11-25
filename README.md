@@ -1,6 +1,7 @@
 # Voice Cloner & TTS Application
 
 A full-stack web application that allows users to clone voices and generate text-to-speech audio using the cloned voices. Built with React.js for the frontend and Node.js/Express for the backend, utilizing the PlayHT API for voice cloning and text-to-speech conversion.
+This is a part of my tasks as an intern at Coding Bits.
 
 ## Table of Contents
 

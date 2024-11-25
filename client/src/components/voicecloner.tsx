@@ -116,7 +116,11 @@ export default function VoiceClonerApp() {
 	return (
 		<div className="min-h-screen bg-gradient-to-bl from-cyan-700 to-blue-900 py-6 flex flex-col justify-center sm:py-12">
 			<div className="relative py-3 sm:max-w-3xl sm:mx-auto w-full px-4 sm:px-0">
-				<div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+				<div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+					<p className="absolute bottom-0 left-0 pl-4 pb-2 text-base text-cyan-400">
+						Coding Bits
+					</p>
+				</div>
 				<div className="relative bg-white shadow-lg sm:rounded-3xl overflow-hidden">
 					<div className="max-w-md mx-auto">
 						<div className="px-4 pt-8 sm:px-10">
